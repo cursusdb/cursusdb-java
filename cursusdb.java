@@ -20,6 +20,12 @@
 
 package cursusdbjava;
 
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.Arrays;
+import java.util.Base64;
+
 class CursusDB {
 
     static class Client {
@@ -29,15 +35,51 @@ class CursusDB {
         private String password;
         private boolean tls;
 
+        private DataInputStream reader;
+
+        private DataOutputStream writer;
+
+
+        private Socket socket;
+
+        // Constructor for CursusDB Client
         Client(String hostIn, int portIn, String usernameIn, String passwordIn, boolean tlsIn) {
             host = hostIn;
             port = portIn;
+            username = usernameIn;
             password = passwordIn;
             tls = tlsIn;
         }
 
-        void Connect() {
-            System.out.println("Connected.");
+        void Connect() throws IOException {
+            // Create new socket
+            socket = new Socket();
+
+            // Connect to cluster
+            socket.connect(new InetSocketAddress("0.0.0.0", port), 1000);
+
+// Setup writer and reader
+            reader = new DataInputStream(socket.getInputStream());
+            writer = new DataOutputStream(socket.getOutputStream());
+
+            Base64.Encoder base64Encoder = Base64.getEncoder();
+            String userPassEncoded = base64Encoder.encodeToString((username + "\\0" + password).getBytes());
+
+            writer.writeBytes("Authentication: " + userPassEncoded + "\r\n");
+
+           String clusterResponse = reader.readLine();
+           System.out.println(clusterResponse);
+
+
+
+            System.out.println("Connected to cluster.");
+        }
+
+        void Close() throws IOException {
+            reader.close();
+            writer.close();
+            socket.close();
+            System.out.println("Cluster connection closed.");
         }
     }
 
