@@ -20,6 +20,9 @@
 
 package cursusdbjava;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -41,7 +44,7 @@ class CursusDB {
 
 
         private Socket socket;
-
+        private SSLSocket secureSocket;
         // Constructor for CursusDB Client
         Client(String hostIn, int portIn, String usernameIn, String passwordIn, boolean tlsIn) {
             host = hostIn;
@@ -52,33 +55,54 @@ class CursusDB {
         }
 
         void Connect() throws IOException {
-            // Create new socket
-            socket = new Socket();
 
-            // Connect to cluster
-            socket.connect(new InetSocketAddress("0.0.0.0", port), 1000);
+            if (tls) {
+                SocketFactory factory = SSLSocketFactory.getDefault();
+                secureSocket = (SSLSocket) factory.createSocket(host, port);
 
-// Setup writer and reader
-            reader = new DataInputStream(socket.getInputStream());
-            writer = new DataOutputStream(socket.getOutputStream());
+                secureSocket.setEnabledCipherSuites(new String[] { "TLS_AES_128_GCM_SHA256" });
+                secureSocket.setEnabledProtocols(new String[] { "TLSv1.3" });
 
-            Base64.Encoder base64Encoder = Base64.getEncoder();
-            String userPassEncoded = base64Encoder.encodeToString((username + "\\0" + password).getBytes());
+                // Connect to cluster
+                secureSocket.connect(new InetSocketAddress("0.0.0.0", port), 1000);
 
-            writer.writeBytes("Authentication: " + userPassEncoded + "\r\n");
+                // Setup writer and reader
+                reader = new DataInputStream(secureSocket.getInputStream());
+                writer = new DataOutputStream(secureSocket.getOutputStream());
+            } else {
+                // Create new socket
+                socket = new Socket();
 
-            String clusterResponse = reader.readLine();
-            System.out.println(clusterResponse);
+
+                // Connect to cluster
+                socket.connect(new InetSocketAddress("0.0.0.0", port), 1000);
+
+                // Setup writer and reader
+                reader = new DataInputStream(socket.getInputStream());
+                writer = new DataOutputStream(socket.getOutputStream());
+            }
+
+                Base64.Encoder base64Encoder = Base64.getEncoder();
+                String userPassEncoded = base64Encoder.encodeToString((username + "\\0" + password).getBytes());
+
+                writer.writeBytes("Authentication: " + userPassEncoded + "\r\n");
+
+                String clusterResponse = reader.readLine();
 
 
+                System.out.println("Connected to cluster.");
 
-            System.out.println("Connected to cluster.");
         }
 
         void Close() throws IOException {
             reader.close();
             writer.close();
-            socket.close();
+
+            if (tls) {
+                secureSocket.close();
+            } else {
+                socket.close();
+            }
             System.out.println("Cluster connection closed.");
         }
 
