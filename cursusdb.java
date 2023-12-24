@@ -26,25 +26,23 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Base64;
 
+// CursusDB class
 class CursusDB {
 
+    // CursusDB client connection class
     static class Client {
-        private String host;
-        private int port;
-        private String username;
-        private String password;
-        private boolean tls;
+        private String host; // Cluster host
+        private int port; // Cluster port
+        private String username; // Cluster database user username
+        private String password; // Cluster database user password
+        private boolean tls; // TLS enabled?
+        private DataInputStream reader; // Reader for connection
+        private DataOutputStream writer; // Writer for connection
+        private Socket socket; // Socket
+        private SSLSocket secureSocket; // Secured socket
 
-        private DataInputStream reader;
-
-        private DataOutputStream writer;
-
-
-        private Socket socket;
-        private SSLSocket secureSocket;
         // Constructor for CursusDB Client
         Client(String hostIn, int portIn, String usernameIn, String passwordIn, boolean tlsIn) {
             host = hostIn;
