@@ -95,13 +95,10 @@ class CursusDB {
                 String clusterResponse = reader.readLine();
 
                 if (clusterResponse.startsWith("0")) {
-
+                    System.out.println("Connected to cluster.");
                 } else {
                     throw new InvalidAuthenticationException("Could not authenticate to cluster");
                 }
-
-
-                System.out.println("Connected to cluster.");
 
         }
 
