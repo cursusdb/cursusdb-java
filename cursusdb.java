@@ -20,6 +20,25 @@
 
 package cursusdbjava;
 
-class CursusDB() {
+class CursusDB {
+
+    static class Client {
+        private String host;
+        private int port;
+        private String username;
+        private String password;
+        private boolean tls;
+
+        Client(String hostIn, int portIn, String usernameIn, String passwordIn, boolean tlsIn) {
+            host = hostIn;
+            port = portIn;
+            password = passwordIn;
+            tls = tlsIn;
+        }
+
+        void Connect() {
+            System.out.println("Connected.");
+        }
+    }
 
 }
