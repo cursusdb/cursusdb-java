@@ -30,7 +30,6 @@ import java.util.Base64;
 
 // CursusDB class
 class CursusDB {
-
     // CursusDB client connection class
     static class Client {
         private String host; // Cluster host
@@ -42,6 +41,14 @@ class CursusDB {
         private DataOutputStream writer; // Writer for connection
         private Socket socket; // Socket
         private SSLSocket secureSocket; // Secured socket
+
+
+        public class InvalidAuthenticationException
+                extends RuntimeException {
+            public InvalidAuthenticationException(String errorMessage) {
+                super(errorMessage);
+            }
+        }
 
         // Constructor for CursusDB Client
         Client(String hostIn, int portIn, String usernameIn, String passwordIn, boolean tlsIn) {
@@ -86,6 +93,12 @@ class CursusDB {
                 writer.writeBytes("Authentication: " + userPassEncoded + "\r\n");
 
                 String clusterResponse = reader.readLine();
+
+                if (clusterResponse.startsWith("0")) {
+
+                } else {
+                    throw new InvalidAuthenticationException("Could not authenticate to cluster");
+                }
 
 
                 System.out.println("Connected to cluster.");

@@ -15,7 +15,7 @@ package cursusdbjava;
             // Connect
             client.Connect();
 
-        } catch (IOException e) {
+        } catch (IOException | CursusDB.Client.InvalidAuthenticationException e) {
             throw new RuntimeException(e);
         }
 
