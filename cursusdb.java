@@ -67,8 +67,8 @@ class CursusDB {
 
             writer.writeBytes("Authentication: " + userPassEncoded + "\r\n");
 
-           String clusterResponse = reader.readLine();
-           System.out.println(clusterResponse);
+            String clusterResponse = reader.readLine();
+            System.out.println(clusterResponse);
 
 
 
@@ -80,6 +80,14 @@ class CursusDB {
             writer.close();
             socket.close();
             System.out.println("Cluster connection closed.");
+        }
+
+        String Query(String query) throws IOException {
+            writer.write((query + "\r\n").getBytes());
+
+            String clusterResponse = reader.readLine();
+            return clusterResponse;
+
         }
     }
 
