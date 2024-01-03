@@ -1,18 +1,19 @@
 ## CursusDB Java Native Client Package
 ### Quick Start
-Add the package
-``` 
-package cursusdbjava;
-```
 
 ```
-        // Construct client connection to cluster
-        // host, port, database user, database user password, tls enabled
-        CursusDB.Client client = new CursusDB.Client("0.0.0.0",7681, "u", "p", false);
+package com.cursusdb.java;
+
+import java.io.IOException;
+
+class Test {
+    public static void main(String[] args) {
+
+        CursusDB.Client client = new CursusDB.Client("0.0.0.0",7681, "db-user-username", "db-user-password", false);
 
 
         try {
-            // Connect
+
             client.Connect();
 
         } catch (IOException | CursusDB.Client.InvalidAuthenticationException e) {
@@ -20,8 +21,8 @@ package cursusdbjava;
         }
 
         try {
-            // Query database
-            String response = client.Query("select * from users;");
+
+            String response = client.Query("ping;");
 
             System.out.println(response);
 
@@ -30,10 +31,12 @@ package cursusdbjava;
         }
 
         try {
-            // Close client connection
             client.Close();
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+
+    }
+}
 ```

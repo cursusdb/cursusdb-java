@@ -1,29 +1,31 @@
 /*
-* CursusDB
-* Java Native Client Package
-* ******************************************************************
-* Copyright (C) 2023 CursusDB
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * CursusDB
+ * Java Native Client Package
+ * ******************************************************************
+ * Copyright (C) 2023 CursusDB
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cursusdbjava;
+package com.cursusdb.java;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Base64;
@@ -68,8 +70,6 @@ class CursusDB {
                 secureSocket.setEnabledCipherSuites(new String[] { "TLS_AES_128_GCM_SHA256" });
                 secureSocket.setEnabledProtocols(new String[] { "TLSv1.3" });
 
-                // Connect to cluster
-                secureSocket.connect(new InetSocketAddress("0.0.0.0", port), 1000);
 
                 // Setup writer and reader
                 reader = new DataInputStream(secureSocket.getInputStream());
@@ -77,7 +77,6 @@ class CursusDB {
             } else {
                 // Create new socket
                 socket = new Socket();
-
 
                 // Connect to cluster
                 socket.connect(new InetSocketAddress("0.0.0.0", port), 1000);
@@ -87,18 +86,18 @@ class CursusDB {
                 writer = new DataOutputStream(socket.getOutputStream());
             }
 
-                Base64.Encoder base64Encoder = Base64.getEncoder();
-                String userPassEncoded = base64Encoder.encodeToString((username + "\\0" + password).getBytes());
+            Base64.Encoder base64Encoder = Base64.getEncoder();
+            String userPassEncoded = base64Encoder.encodeToString((username + "\\0" + password).getBytes());
 
-                writer.writeBytes("Authentication: " + userPassEncoded + "\r\n");
+            writer.writeBytes("Authentication: " + userPassEncoded + "\r\n");
 
-                String clusterResponse = reader.readLine();
+            String clusterResponse = reader.readLine();
 
-                if (clusterResponse.startsWith("0")) {
-                    System.out.println("Connected to cluster.");
-                } else {
-                    throw new InvalidAuthenticationException("Could not authenticate to cluster");
-                }
+            if (clusterResponse.startsWith("0")) {
+                System.out.println("Connected to cluster.");
+            } else {
+                throw new InvalidAuthenticationException("Could not authenticate to cluster");
+            }
 
         }
 
