@@ -1,10 +1,12 @@
 ## CursusDB Java Native Client Package
 ### Quick Start
+Get the package and call it from within the class you're wanting to work in.
+
 
 ```
-package com.cursusdb.java;
-
 import java.io.IOException;
+
+package com.cursusdb.java;
 
 class Example {
     public static void main(String[] args) {
