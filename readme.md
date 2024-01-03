@@ -6,7 +6,7 @@ package com.cursusdb.java;
 
 import java.io.IOException;
 
-class Test {
+class Example {
     public static void main(String[] args) {
 
         CursusDB.Client client = new CursusDB.Client("0.0.0.0",7681, "db-user-username", "db-user-password", false);
